@@ -14,12 +14,20 @@ public class Hello {
         return randNum;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static String readInput() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         String name = reader.readLine();
 
-        String text = "Hello," + name + ", Ya Bastard!";
+        String text = "Hello, " + name + ", Ya Bastard!";
+
+        return text;
+    }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Please enter your name:\n");
+
+        String text = readInput();
 
         int randNum = randInt();
 
