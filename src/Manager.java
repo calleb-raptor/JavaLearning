@@ -18,6 +18,11 @@ public class Manager {
                     + "DateOpened TEXT," + "DateClosed TEXT)";
 
             stmt.executeUpdate(sql);
+
+            sql = "CREATE TABLE IF NOT EXISTS Trans (ID INTEGER PRIMARY KEY NOT NULL," + "AccountID INT NOT NULL,"
+                    + "Amount REAL," + "Date TEXT);";
+
+            stmt.executeUpdate(sql);
             stmt.close();
             c.close();
         } catch (Exception e) {
@@ -98,24 +103,133 @@ public class Manager {
         menu();
     }
 
-    public static void showAccounts() {
+    public static void showAccounts() throws IOException {
         getAccounts();
+        System.out.println(
+                "If you would like to view transactions for a particular account\nplease input the account number below:\n");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        int accountNumber = Integer.parseInt(reader.readLine());
+
+        if (accountNumber > 0) {
+            showTransactions(accountNumber);
+        } else {
+            System.out.println("Invalid account number...");
+        }
     }
 
-    public static void showTransactions() {
-        System.out.println("This is where transactions will go");
+    public static void getTransactions(int AccountNumber) {
+        Connection c = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:testDB.db");
+
+            String sql = "SELECT COUNT(ID) FROM Trans WHERE AccountID = ?;";
+            pstmt = c.prepareStatement(sql);
+            pstmt.setInt(1, AccountNumber);
+
+            ResultSet count = pstmt.executeQuery();
+            while (count.next()) {
+                int numberOfTrans = count.getInt(1);
+                System.out.println("Account " + AccountNumber + " has " + numberOfTrans + " transaction(s)\n");
+            }
+
+            sql = "SELECT * FROM Trans WHERE AccountID = ?;";
+            pstmt = c.prepareStatement(sql);
+            pstmt.setInt(1, AccountNumber);
+
+            ResultSet res = pstmt.executeQuery();
+
+            while (res.next()) {
+                int id = res.getInt(1);
+                float amount = res.getFloat(3);
+                String date = res.getString(4);
+
+                System.out.println("Transaction ID: " + id + "\nAmount: " + amount + "\nDate: " + date + "\n");
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    public static String optionReader() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String option = reader.readLine();
+
+        return option;
+    }
+
+    public static void insertTransaction(int AccountNumber, float amount, String Date) {
+        Connection c = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:testDB.db");
+            System.out.println("Opened db...");
+
+            // stmt = c.createStatement();
+            String sql = "INSERT INTO Trans (AccountID, Amount, Date) VALUES (?, ?, ?);";
+            pstmt = c.prepareStatement(sql);
+            pstmt.setInt(1, AccountNumber);
+            pstmt.setFloat(2, amount);
+            pstmt.setString(3, Date);
+            pstmt.executeUpdate();
+            pstmt.close();
+            c.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    public static void newTransaction(int AccountNumber) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Add new Transaction:");
+        System.out.println("Please input details below:");
+        System.out.println("Amount:\n");
+        float amount = Float.parseFloat(reader.readLine());
+        System.out.println("Thank you, now please enter date:\n");
+        String date = reader.readLine();
+        insertTransaction(AccountNumber, amount, date);
+        showTransactions(AccountNumber);
+    }
+
+    public static void showTransactions(int AccountNumber) throws IOException {
+        System.out.println("Showing transactions for account: " + AccountNumber);
+
+        getTransactions(AccountNumber);
+
+        System.out.println("Would you like to input new transactions?\n");
+
+        String option = optionReader();
+
+        switch (option) {
+            case "y":
+            case "Y":
+                newTransaction(AccountNumber);
+                break;
+            case "n":
+            case "N":
+                menu();
+                break;
+            default:
+                System.out.println("Invalid Option...");
+        }
     }
 
     public static void menu() throws IOException {
-        System.out.println(
-                "Please choose from the following options:\n1. View Accounts\n2. View Transactions\n3. New Account");
+        System.out.println("Please choose from the following options:\n1. View Accounts\n2. New Account");
         int option = readSelection();
         if (option == 1) {
             showAccounts();
         } else if (option == 2) {
-            showTransactions();
-        } else if (option == 3) {
             newAccount();
+        } else {
+            System.out.println("Invalid option");
         }
     }
 
