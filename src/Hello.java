@@ -1,6 +1,12 @@
+
 /**
  * Hello
  */
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class Hello {
 
     public static int randInt() {
@@ -8,8 +14,12 @@ public class Hello {
         return randNum;
     }
 
-    public static void main(String[] args) {
-        String text = "Hello Ya Bastard!";
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String name = reader.readLine();
+
+        String text = "Hello," + name + ", Ya Bastard!";
 
         int randNum = randInt();
 
