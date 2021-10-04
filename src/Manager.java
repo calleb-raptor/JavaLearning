@@ -186,6 +186,11 @@ public class Manager {
         }
     }
 
+    public static void invalidOption() throws IOException {
+        System.out.println("Invalid option...");
+        menu();
+    }
+
     public static void newTransaction(int AccountNumber) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Add new Transaction:");
@@ -217,7 +222,7 @@ public class Manager {
                 menu();
                 break;
             default:
-                System.out.println("Invalid Option...");
+                invalidOption();
         }
     }
 
@@ -232,7 +237,7 @@ public class Manager {
                 newAccount();
                 break;
             default:
-                System.out.println("Invalid option");
+                invalidOption();
         }
     }
 
