@@ -3,6 +3,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+class Transaction {
+    public int AcountNumber;
+    public float Amount;
+    public String Date;
+}
+
+class Account {
+    public int AccountNumber;
+    public String AccountName;
+    public String DateOpened;
+}
+
 public class Manager {
 
     public static void initDB() {
