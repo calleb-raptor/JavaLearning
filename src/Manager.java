@@ -224,12 +224,15 @@ public class Manager {
     public static void menu() throws IOException {
         System.out.println("Please choose from the following options:\n1. View Accounts\n2. New Account");
         int option = readSelection();
-        if (option == 1) {
-            showAccounts();
-        } else if (option == 2) {
-            newAccount();
-        } else {
-            System.out.println("Invalid option");
+        switch (option) {
+            case 1:
+                showAccounts();
+                break;
+            case 2:
+                newAccount();
+                break;
+            default:
+                System.out.println("Invalid option");
         }
     }
 
