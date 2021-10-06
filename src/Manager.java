@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 class Transaction {
-    public int AcountNumber;
+    public int AccountNumber;
     public float Amount;
     public String Date;
 }
@@ -51,7 +51,7 @@ public class Manager {
         return menuOption;
     }
 
-    public static void insertNewAccount(int AccountNumber, String AccountName, String DateOpened) {
+    public static void insertNewAccount(Account account) {
         Connection c = null;
         PreparedStatement pstmt = null;
 
@@ -63,9 +63,9 @@ public class Manager {
             // stmt = c.createStatement();
             String sql = "INSERT INTO Accounts (ID, AccountName, DateOpened) VALUES (?, ?, ?);";
             pstmt = c.prepareStatement(sql);
-            pstmt.setInt(1, AccountNumber);
-            pstmt.setString(2, AccountName);
-            pstmt.setString(3, DateOpened);
+            pstmt.setInt(1, account.AccountNumber);
+            pstmt.setString(2, account.AccountName);
+            pstmt.setString(3, account.DateOpened);
             pstmt.executeUpdate();
             pstmt.close();
             c.close();
@@ -100,18 +100,19 @@ public class Manager {
 
     public static void newAccount() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Account account = new Account();
         System.out.println("Please fill in the details below to set up a new account");
         System.out.println("AccountNumber:\n");
-        int accountNumber = Integer.parseInt(reader.readLine());
+        account.AccountNumber = Integer.parseInt(reader.readLine());
 
         System.out.println("Thank you, now please enter Account Name:\n");
-        String accountName = reader.readLine();
+        account.AccountName = reader.readLine();
 
-        String dateOpened = "02/10/2021";
-        insertNewAccount(accountNumber, accountName, dateOpened);
+        account.DateOpened = "02/10/2021";
 
+        insertNewAccount(account);
         System.out.println("Thank you, your account has been set up with the below details:\nAccount Number: "
-                + accountNumber + "\nAccount Name: " + accountName);
+                + account.AccountNumber + "\nAccount Name: " + account.AccountName);
         menu();
     }
 
@@ -174,7 +175,7 @@ public class Manager {
         return option;
     }
 
-    public static void insertTransaction(int AccountNumber, float amount, String Date) {
+    public static void insertTransaction(Transaction t) {
         Connection c = null;
         PreparedStatement pstmt = null;
 
@@ -186,9 +187,9 @@ public class Manager {
             // stmt = c.createStatement();
             String sql = "INSERT INTO Trans (AccountID, Amount, Date) VALUES (?, ?, ?);";
             pstmt = c.prepareStatement(sql);
-            pstmt.setInt(1, AccountNumber);
-            pstmt.setFloat(2, amount);
-            pstmt.setString(3, Date);
+            pstmt.setInt(1, t.AccountNumber);
+            pstmt.setFloat(2, t.Amount);
+            pstmt.setString(3, t.Date);
             pstmt.executeUpdate();
             pstmt.close();
             c.close();
@@ -203,20 +204,26 @@ public class Manager {
         menu();
     }
 
-    public static void newTransaction(int AccountNumber) throws IOException {
+    public static void newTransaction(Transaction t) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        // Transaction t = new Transaction();
         System.out.println("Add new Transaction:");
         System.out.println("Please input details below:");
         System.out.println("Amount:\n");
         float amount = Float.parseFloat(reader.readLine());
         System.out.println("Thank you, now please enter date:\n");
         String date = reader.readLine();
-        insertTransaction(AccountNumber, amount, date);
-        showTransactions(AccountNumber);
+        // t.AcountNumber = AccountNumber;
+        t.Amount = amount;
+        t.Date = date;
+        insertTransaction(t);
+        showTransactions(t.AccountNumber);
     }
 
     public static void showTransactions(int AccountNumber) throws IOException {
         System.out.println("Showing transactions for account: " + AccountNumber);
+        Transaction t = new Transaction();
+        t.AccountNumber = AccountNumber;
 
         getTransactions(AccountNumber);
 
@@ -227,7 +234,7 @@ public class Manager {
         switch (option) {
             case "y":
             case "Y":
-                newTransaction(AccountNumber);
+                newTransaction(t);
                 break;
             case "n":
             case "N":
